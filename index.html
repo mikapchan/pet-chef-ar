@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ペットシェフARフレーム</title>
+  <style>
+    body { margin:0; overflow:hidden; }
+    video, canvas { position:absolute; top:0; left:0; width:100%; height:100%; }
+    #frame, #hat, #spoon, #sparkle {
+      position:absolute;
+      pointer-events:none;
+    }
+    #frame, #sparkle { top:0; left:0; width:100%; height:100%; }
+  </style>
+</head>
+<body>
+  <video id="camera" autoplay playsinline></video>
+  <canvas id="canvas"></canvas>
+
+  <!-- 背景フレーム -->
+  <img id="frame" src="frame.png" alt="ブランドフレーム">
+
+  <!-- シェフ帽 -->
+  <img id="hat" src="chef_hat.png" alt="シェフ帽">
+
+  <!-- 小物 -->
+  <img id="spoon" src="spoon.png" alt="スプーン">
+
+  <!-- 雪やキラキラ -->
+  <img id="sparkle" src="sparkle.gif" alt="雪">
+
+  <script src="script.js"></script>
+</body>
+</html>
