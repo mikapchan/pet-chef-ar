@@ -1,45 +1,97 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>ペットシェフARフレーム</title>
-<style>
-  body { margin:0; overflow:hidden; }
-  video, canvas { 
-    position:absolute; top:0; left:0; width:100%; height:100%;
-  }
+const video = document.getElementById('camera');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const spoon = document.getElementById('spoon');
+const sparkle = document.getElementById('sparkle');
 
-  #camera {
-    z-index:1; /* カメラ映像：背景の次に奥 */
-  }
+const recordBtn = document.createElement('button');
+recordBtn.textContent = '録画開始';
+recordBtn.style.position = 'absolute';
+recordBtn.style.top = '10px';
+recordBtn.style.left = '10px';
+recordBtn.style.zIndex = '10';
+recordBtn.style.padding = '10px 20px';
+recordBtn.style.fontSize = '16px';
+document.body.appendChild(recordBtn);
 
-  #spoon {
-    position:absolute;
-    pointer-events:none;
-    z-index:2; /* 小物 */
-  }
+let mediaRecorder;
+let recordedChunks = [];
 
-  #sparkle {
-    position:absolute;
-    top:0; left:0;
-    width:100vw;   /* 画面幅に合わせる */
-    height:auto;   /* 縦横比を維持 */
-    pointer-events:none;
-    z-index:3;
+// canvas サイズ調整
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 }
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
 
-</style>
-</head>
-<body>
-  <video id="camera" autoplay playsinline muted></video>
-  <canvas id="canvas"></canvas>
+// カメラ起動（背面カメラ）
+navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: "environment" } } })
+  .then(stream => { video.srcObject = stream; })
+  .catch(err => { console.error('カメラアクセス失敗', err); });
 
-  <!-- 小物 -->
-  <img id="spoon" src="spoon.png" alt="スプーン">
+// 描画ループ
+function draw() {
+  const vw = canvas.width;
+  const vh = canvas.height;
 
-  <!-- 雪やキラキラ -->
-  <img id="sparkle" src="sparkle.gif" alt="雪">
+  // カメラ映像
+  ctx.drawImage(video, 0, 0, vw, vh);
 
-  <script src="script.js"></script>
-</body>
-</html>
+  // spoonの描画（元画像の縦横比維持）
+  if (spoon.complete) {
+    const spoonAspect = spoon.naturalWidth / spoon.naturalHeight;
+    const spoonWidth = vw;               // 横幅いっぱい
+    const spoonHeight = spoonWidth / spoonAspect;
+    const spoonY = vh - spoonHeight;     // 下部に配置
+    ctx.drawImage(spoon, 0, spoonY, spoonWidth, spoonHeight);
+  }
+
+  // sparkleの描画（縦横比維持）
+  if (sparkle.complete) {
+    const sparkleAspect = sparkle.naturalWidth / sparkle.naturalHeight;
+    const sparkleWidth = vw;
+    const sparkleHeight = sparkleWidth / sparkleAspect;
+    const sparkleY = (vh - sparkleHeight) / 2;  // 中央寄せ
+    ctx.drawImage(sparkle, 0, sparkleY, sparkleWidth, sparkleHeight);
+  }
+
+  requestAnimationFrame(draw);
+}
+draw();
+
+// 録画ボタン処理
+recordBtn.addEventListener('click', () => {
+  if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+    const stream = canvas.captureStream(30); // 30fps
+    mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm; codecs=vp9' });
+    recordedChunks = [];
+
+    mediaRecorder.ondataavailable = e => {
+      if (e.data.size > 0) recordedChunks.push(e.data);
+    };
+
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(recordedChunks, { type: 'video/webm' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'pet_chefs_ar.webm';
+      a.click();
+      URL.revokeObjectURL(url);
+    };
+
+    mediaRecorder.start();
+    recordBtn.textContent = '録画停止';
+  } else if (mediaRecorder.state === 'recording') {
+    mediaRecorder.stop();
+    recordBtn.textContent = '録画開始';
+  }
+});
+
+// ページ離脱時にカメラ停止
+window.addEventListener('beforeunload', () => {
+  if (video.srcObject) {
+    video.srcObject.getTracks().forEach(track => track.stop());
+  }
+});
