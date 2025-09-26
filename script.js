@@ -25,22 +25,24 @@ navigator.mediaDevices.getUserMedia({
     .catch(err => console.error('前面カメラも失敗:', err));
 });
 
-// 帽子・小物を画面幅・高さに対して相対配置
+// 帽子・スプーンを video の左上を基準に absolute で配置
 function updatePositions() {
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
+  const vx = video.offsetLeft;
+  const vy = video.offsetTop;
+  const vw = video.offsetWidth;
+  const vh = video.offsetHeight;
 
-  // 帽子：左側中心より少し上
+  // 帽子：左側中央より少し上
   hat.style.position = 'absolute';
-  hat.style.left = (vw * 0.05) + 'px';  // 左5%
-  hat.style.top = (vh * 0.1) + 'px';    // 上10%
-  hat.style.width = (vw * 0.4) + 'px';  // 幅40%
-  hat.style.height = 'auto';            // 縦横比維持
+  hat.style.left = (vx + vw * 0.05) + 'px'; // video 左5%
+  hat.style.top = (vy + vh * 0.1) + 'px';   // video 高さの10%下
+  hat.style.width = (vw * 0.4) + 'px';      // 幅40%
+  hat.style.height = 'auto';                // 縦横比維持
 
-  // スプーン：左側中心より下
+  // スプーン：左側中央より下
   spoon.style.position = 'absolute';
-  spoon.style.left = (vw * 0.05) + 'px';
-  spoon.style.top = (vh * 0.6) + 'px';  // 下60%
+  spoon.style.left = (vx + vw * 0.05) + 'px';
+  spoon.style.top = (vy + vh * 0.6) + 'px'; // video 高さの60%下
   spoon.style.width = (vw * 0.4) + 'px';
   spoon.style.height = 'auto';
 
