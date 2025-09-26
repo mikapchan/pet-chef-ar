@@ -8,7 +8,7 @@ let animationId; // requestAnimationFrame用
 
 // カメラ起動（背面カメラ希望）
 navigator.mediaDevices.getUserMedia({ 
-  video: { facingMode: { ideal: "environment" } } // 背面カメラを希望
+  video: { facingMode: { ideal: "environment" } } // 背面カメラ希望
 })
 .then(stream => {
   video.srcObject = stream;
@@ -25,26 +25,24 @@ navigator.mediaDevices.getUserMedia({
     .catch(err => console.error('前面カメラも失敗:', err));
 });
 
-// 帽子・小物を video の左側上下に配置
+// 帽子・小物を画面幅・高さに対して相対配置
 function updatePositions() {
-  const vw = video.offsetWidth;
-  const vh = video.offsetHeight;
-  const vx = video.offsetLeft;
-  const vy = video.offsetTop;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
 
-  // 帽子：左側中央より少し上
+  // 帽子：左側中心より少し上
   hat.style.position = 'absolute';
-  hat.style.width = (vw / 2) + 'px'; // 左半分に収める
-  hat.style.height = 'auto';         // 元比率を維持
-  hat.style.left = vx + 'px';
-  hat.style.top = vy + vh * 0.15 + 'px'; // 少し上にずらす
+  hat.style.left = (vw * 0.05) + 'px';  // 左5%
+  hat.style.top = (vh * 0.1) + 'px';    // 上10%
+  hat.style.width = (vw * 0.4) + 'px';  // 幅40%
+  hat.style.height = 'auto';            // 縦横比維持
 
-  // スプーン：左側中央より下
+  // スプーン：左側中心より下
   spoon.style.position = 'absolute';
-  spoon.style.width = (vw / 2) + 'px';
+  spoon.style.left = (vw * 0.05) + 'px';
+  spoon.style.top = (vh * 0.6) + 'px';  // 下60%
+  spoon.style.width = (vw * 0.4) + 'px';
   spoon.style.height = 'auto';
-  spoon.style.left = vx + 'px';
-  spoon.style.top = vy + vh * 0.6 + 'px'; // 下にずらす
 
   animationId = requestAnimationFrame(updatePositions);
 }
