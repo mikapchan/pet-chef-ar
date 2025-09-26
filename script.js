@@ -12,11 +12,9 @@ function updatePositions() {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
 
-  hat.style.left = (vw/2 - 50) + 'px';
-  hat.style.top = (vh/3) + 'px';
+  hat.style.position = 'absolute';
+spoon.style.position = 'absolute';
 
-  spoon.style.left = (vw/2 - 30) + 'px';
-  spoon.style.top = (vh/2) + 'px';
 
   requestAnimationFrame(updatePositions);
 }
