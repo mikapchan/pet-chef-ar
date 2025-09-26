@@ -6,13 +6,17 @@
   <style>
     body { margin:0; overflow:hidden; background:#000; }
 
-    canvas { 
-      position:absolute; top:0; left:0; 
-      width:100vw; height:100vh; 
+    /* canvas は内部 1080x1920、画面には全画面表示 */
+    canvas {
+      position:absolute;
+      top:0;
+      left:0;
+      width:100vw;
+      height:100vh;
       z-index:1;
     }
 
-    /* GIF sparkle は canvas の上に置く */
+    /* sparkle は canvas 上に置く */
     #sparkle {
       position:absolute;
       top:0;
@@ -26,11 +30,11 @@
     /* 録画ボタン */
     #recordBtn {
       position:fixed;
-      bottom:30px;             /* 画面下からの余白 */
+      bottom:30px;
       left:50%;
       transform:translateX(-50%);
       z-index:10;
-      padding:15px 30px;       /* ボタン大きめ */
+      padding:15px 30px;
       font-size:18px;
       border-radius:8px;
       background-color:rgba(255,255,255,0.9);
@@ -40,7 +44,6 @@
   </style>
 </head>
 <body>
-  <!-- カメラ映像は非表示 -->
   <video id="camera" autoplay playsinline muted style="display:none;"></video>
   <canvas id="canvas"></canvas>
 
