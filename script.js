@@ -7,15 +7,11 @@ const recordBtn = document.getElementById('recordBtn');
 let mediaRecorder;
 let recordedChunks = [];
 
-// canvas サイズを画面に合わせる
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
+// canvas 内部サイズ固定 1080 x 1920
+canvas.width = 1080;
+canvas.height = 1920;
 
-// カメラ起動（背面カメラ優先）
+// 背面カメラ起動
 navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } } })
   .then(stream => { video.srcObject = stream; })
   .catch(err => {
@@ -23,43 +19,49 @@ navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment
     return navigator.mediaDevices.getUserMedia({ video: true }).then(stream => { video.srcObject = stream; });
   });
 
-// 画像が読み込まれたら描画開始
-spoon.onload = () => { draw(); };
+// 描画開始
+video.onloadedmetadata = () => {
+  video.play();
+  draw();
+};
 
-// 描画ループ
+spoon.onload = () => {
+  draw();
+};
+
 function draw() {
-  const vw = canvas.width;
-  const vh = canvas.height;
+  // 1080x1920 canvas に描画
+  ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  // ① カメラ映像（canvas奥）
-  if (video.readyState === video.HAVE_ENOUGH_DATA) {
-    ctx.drawImage(video, 0, 0, vw, vh);
+  // カメラ映像
+  if(video.readyState === video.HAVE_ENOUGH_DATA){
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
   }
 
-  // ② spoon（canvas 下端いっぱいに表示）
-  if (spoon.complete) {
+  // spoon：canvas 下端に幅いっぱい表示
+  if(spoon.complete){
     const aspect = spoon.naturalWidth / spoon.naturalHeight;
-    const width = vw;
+    const width = canvas.width;
     const height = width / aspect;
-    const y = vh - height; // 下端に揃える
+    const y = canvas.height - height;
     ctx.drawImage(spoon, 0, y, width, height);
   }
 
   requestAnimationFrame(draw);
 }
 
-// 録画機能
-recordBtn.addEventListener('click', () => {
-  if (!mediaRecorder || mediaRecorder.state === 'inactive') {
-    const stream = canvas.captureStream(30); // 30fps
-    let options = { mimeType: 'video/webm; codecs=vp9' };
-    if (!MediaRecorder.isTypeSupported(options.mimeType)) options = { mimeType: '' };
+// 録画ボタン
+recordBtn.addEventListener('click', ()=>{
+  if(!mediaRecorder || mediaRecorder.state==='inactive'){
+    const stream = canvas.captureStream(30);
+    let options = { mimeType:'video/webm; codecs=vp9' };
+    if(!MediaRecorder.isTypeSupported(options.mimeType)) options={ mimeType:'' };
     mediaRecorder = new MediaRecorder(stream, options);
     recordedChunks = [];
 
-    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(recordedChunks, { type: 'video/webm' });
+    mediaRecorder.ondataavailable = e => { if(e.data.size>0) recordedChunks.push(e.data); };
+    mediaRecorder.onstop = ()=>{
+      const blob = new Blob(recordedChunks, {type:'video/webm'});
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -69,14 +71,15 @@ recordBtn.addEventListener('click', () => {
     };
 
     mediaRecorder.start();
-    recordBtn.textContent = '録画停止';
-  } else if (mediaRecorder.state === 'recording') {
+    recordBtn.textContent='録画停止';
+  }else if(mediaRecorder.state==='recording'){
     mediaRecorder.stop();
-    recordBtn.textContent = '録画開始';
+    recordBtn.textContent='録画開始';
   }
 });
 
 // ページ離脱でカメラ停止
-window.addEventListener('beforeunload', () => {
-  if (video.srcObject) video.srcObject.getTracks().forEach(track => track.stop());
+window.addEventListener('beforeunload', ()=>{
+  if(video.srcObject) video.srcObject.getTracks().forEach(track=>track.stop());
 });
+
