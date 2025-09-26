@@ -1,5 +1,4 @@
 const video = document.getElementById('camera');
-const hat = document.getElementById('hat');
 const spoon = document.getElementById('spoon');
 
 // カメラ起動（背面カメラ）
@@ -8,16 +7,6 @@ navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: "environment
   .catch(err => { console.error('カメラアクセス失敗', err); });
 
 // 画像が読み込まれたら幅・高さ・位置を設定
-hat.onload = () => {
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
-  hat.style.position = 'absolute';
-  hat.style.width = (vw * 0.8) + 'px';   // 画面幅の50%
-  hat.style.height = 'auto';             // 縦横比維持
-  hat.style.left = (vw * 0.25) + 'px';   // 中央寄せ
-  hat.style.top  = (vh * 0.1) + 'px';    // 上から10%
-};
-
 spoon.onload = () => {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
