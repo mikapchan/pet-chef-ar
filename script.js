@@ -34,10 +34,12 @@ function updatePositions() {
 
   // 帽子：左側中央より少し上
   hat.style.position = 'absolute';
-  hat.style.left = (window.innerWidth * 0.25) + 'px'; // 左から25%の位置で中央寄せ
-　hat.style.top  = (window.innerHeight * 0.1) + 'px'; // 上から10%
-  hat.style.width = (window.innerWidth * 0.5) + 'px';  // 画面幅の50%
+　hat.style.top  = '50px'; // 上から10%
+  hat.style.width = 'auto';
+  hat.style.left = '10px';      // 左端に揃える
+　hat.style.width = '40vw';   // 画面幅いっぱい
 　hat.style.height = 'auto';
+  
   // スプーン：左側中央より下
   spoon.style.position = 'absolute';
   spoon.style.left = '0px';      // 左端に揃える
