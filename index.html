@@ -3,15 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <title>ペットシェフARフレーム</title>
-  <style>
-    body { margin:0; overflow:hidden; }
-    video, canvas { position:absolute; top:0; left:0; width:100%; height:100%; }
-    #frame, #hat, #spoon, #sparkle {
-      position:absolute;
-      pointer-events:none;
-    }
-    #frame, #sparkle { top:0; left:0; width:100%; height:100%; }
-  </style>
+<style>
+  body { margin:0; overflow:hidden; }
+  video, canvas { 
+    position:absolute; top:0; left:0; width:100%; height:100%;
+  }
+
+  #frame {
+    position:absolute;
+    top:0; left:0;
+    width:100%; height:100%;
+    z-index:1; /* 背景フレーム */
+  }
+
+  #camera {
+    z-index:2; /* カメラ映像：背景の次に奥 */
+  }
+
+  #hat, #spoon {
+    position:absolute;
+    pointer-events:none;
+    z-index:3; /* 帽子・小物 */
+  }
+
+  #sparkle {
+    position:absolute;
+    top:0; left:0;
+    width:100%; height:100%;
+    pointer-events:none;
+    z-index:4; /* キラキラ */
+  }
+</style>
 </head>
 <body>
   <video id="camera" autoplay playsinline></video>
