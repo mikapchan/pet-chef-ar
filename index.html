@@ -52,6 +52,15 @@
 
   <!-- GIF sparkle -->
   <img id="sparkle" src="sparkle.gif" alt="雪">
+  #sparkle {
+  position:absolute;
+  top:0;
+  left:0;
+  width:100vw;   /* 画面幅に合わせる */
+  height:auto;   /* 縦横比維持 */
+  z-index:2;     /* spoon より上、録画ボタンより下など調整 */
+  pointer-events:none;
+}
 
   <button id="recordBtn">録画開始</button>
 
