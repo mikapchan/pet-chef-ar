@@ -24,6 +24,15 @@ navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment
     return navigator.mediaDevices.getUserMedia({ video: true }).then(stream => { video.srcObject = stream; });
   });
 
+// 画像が読み込まれてから描画開始
+let imagesLoaded = 0;
+function checkAllLoaded() {
+  imagesLoaded++;
+  if(imagesLoaded === 2) draw();
+}
+spoon.onload = checkAllLoaded;
+sparkle.onload = checkAllLoaded;
+
 // 描画ループ
 function draw() {
   const vw = canvas.width;
@@ -32,7 +41,7 @@ function draw() {
   // カメラ映像
   ctx.drawImage(video, 0, 0, vw, vh);
 
-  // spoon描画（下部に横幅いっぱい）
+  // spoon描画（画面下いっぱいに横幅に合わせる）
   if (spoon.complete) {
     const aspect = spoon.naturalWidth / spoon.naturalHeight;
     const width = vw;
@@ -50,7 +59,6 @@ function draw() {
 
   requestAnimationFrame(draw);
 }
-draw();
 
 // 録画ボタン
 recordBtn.addEventListener('click', () => {
