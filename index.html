@@ -9,21 +9,14 @@
     position:absolute; top:0; left:0; width:100%; height:100%;
   }
 
-  #frame {
-    position:absolute;
-    top:0; left:0;
-    width:100%; height:100%;
-    z-index:1; /* 背景フレーム */
-  }
-
   #camera {
-    z-index:2; /* カメラ映像：背景の次に奥 */
+    z-index:1; /* カメラ映像：背景の次に奥 */
   }
 
-  #hat, #spoon {
+  #spoon {
     position:absolute;
     pointer-events:none;
-    z-index:3; /* 帽子・小物 */
+    z-index:2; /* 小物 */
   }
 
   #sparkle {
@@ -31,19 +24,13 @@
     top:0; left:0;
     width:100%; height:100%;
     pointer-events:none;
-    z-index:4; /* キラキラ */
+    z-index:3; /* キラキラ */
   }
 </style>
 </head>
 <body>
   <video id="camera" autoplay playsinline muted></video>
   <canvas id="canvas"></canvas>
-
-  <!-- 背景フレーム -->
-  <img id="frame" src="frame.png" alt="ブランドフレーム">
-
-  <!-- シェフ帽 -->
-  <img id="hat" src="chef_hat.png" alt="シェフ帽">
 
   <!-- 小物 -->
   <img id="spoon" src="spoon.png" alt="スプーン">
