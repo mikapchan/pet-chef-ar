@@ -3,21 +3,12 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const spoon = document.getElementById('spoon');
 const sparkle = document.getElementById('sparkle');
-
-const recordBtn = document.createElement('button');
-recordBtn.textContent = '録画開始';
-recordBtn.style.position = 'absolute';
-recordBtn.style.top = '10px';
-recordBtn.style.left = '10px';
-recordBtn.style.zIndex = '10';
-recordBtn.style.padding = '10px 20px';
-recordBtn.style.fontSize = '16px';
-document.body.appendChild(recordBtn);
+const recordBtn = document.getElementById('recordBtn');
 
 let mediaRecorder;
 let recordedChunks = [];
 
-// canvas サイズ調整
+// canvasサイズ調整
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -25,10 +16,13 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
-// カメラ起動（背面カメラ）
-navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: "environment" } } })
+// カメラ起動（背面優先）
+navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } } })
   .then(stream => { video.srcObject = stream; })
-  .catch(err => { console.error('カメラアクセス失敗', err); });
+  .catch(err => {
+    console.warn('背面カメラ取得失敗、フロントに切替', err);
+    return navigator.mediaDevices.getUserMedia({ video: true }).then(stream => { video.srcObject = stream; });
+  });
 
 // 描画ループ
 function draw() {
@@ -38,39 +32,36 @@ function draw() {
   // カメラ映像
   ctx.drawImage(video, 0, 0, vw, vh);
 
-  // spoonの描画（元画像の縦横比維持）
+  // spoon描画（下部に横幅いっぱい）
   if (spoon.complete) {
-    const spoonAspect = spoon.naturalWidth / spoon.naturalHeight;
-    const spoonWidth = vw;               // 横幅いっぱい
-    const spoonHeight = spoonWidth / spoonAspect;
-    const spoonY = vh - spoonHeight;     // 下部に配置
-    ctx.drawImage(spoon, 0, spoonY, spoonWidth, spoonHeight);
+    const aspect = spoon.naturalWidth / spoon.naturalHeight;
+    const width = vw;
+    const height = width / aspect;
+    ctx.drawImage(spoon, 0, vh - height, width, height);
   }
 
-  // sparkleの描画（縦横比維持）
+  // sparkle描画（縦横比維持で中央）
   if (sparkle.complete) {
-    const sparkleAspect = sparkle.naturalWidth / sparkle.naturalHeight;
-    const sparkleWidth = vw;
-    const sparkleHeight = sparkleWidth / sparkleAspect;
-    const sparkleY = (vh - sparkleHeight) / 2;  // 中央寄せ
-    ctx.drawImage(sparkle, 0, sparkleY, sparkleWidth, sparkleHeight);
+    const aspect = sparkle.naturalWidth / sparkle.naturalHeight;
+    const width = vw;
+    const height = width / aspect;
+    ctx.drawImage(sparkle, 0, (vh - height)/2, width, height);
   }
 
   requestAnimationFrame(draw);
 }
 draw();
 
-// 録画ボタン処理
+// 録画ボタン
 recordBtn.addEventListener('click', () => {
   if (!mediaRecorder || mediaRecorder.state === 'inactive') {
     const stream = canvas.captureStream(30); // 30fps
-    mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm; codecs=vp9' });
+    let options = { mimeType: 'video/webm; codecs=vp9' };
+    if (!MediaRecorder.isTypeSupported(options.mimeType)) options = { mimeType: '' };
+    mediaRecorder = new MediaRecorder(stream, options);
     recordedChunks = [];
 
-    mediaRecorder.ondataavailable = e => {
-      if (e.data.size > 0) recordedChunks.push(e.data);
-    };
-
+    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
     mediaRecorder.onstop = () => {
       const blob = new Blob(recordedChunks, { type: 'video/webm' });
       const url = URL.createObjectURL(blob);
@@ -89,9 +80,7 @@ recordBtn.addEventListener('click', () => {
   }
 });
 
-// ページ離脱時にカメラ停止
+// ページ離脱でカメラ停止
 window.addEventListener('beforeunload', () => {
-  if (video.srcObject) {
-    video.srcObject.getTracks().forEach(track => track.stop());
-  }
+  if (video.srcObject) video.srcObject.getTracks().forEach(track => track.stop());
 });
