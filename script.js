@@ -2,13 +2,12 @@ const video = document.getElementById('camera');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const spoon = document.getElementById('spoon');
-const sparkle = document.getElementById('sparkle');
 const recordBtn = document.getElementById('recordBtn');
 
 let mediaRecorder;
 let recordedChunks = [];
 
-// canvasサイズを画面サイズに
+// canvas サイズを画面に合わせる
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -16,7 +15,7 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
-// カメラ起動（背面優先）
+// カメラ起動（背面カメラ優先）
 navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } } })
   .then(stream => { video.srcObject = stream; })
   .catch(err => {
@@ -25,38 +24,25 @@ navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment
   });
 
 // 画像が読み込まれたら描画開始
-let imagesLoaded = 0;
-function checkAllLoaded() {
-  imagesLoaded++;
-  if(imagesLoaded === 2) draw();
-}
-spoon.onload = checkAllLoaded;
-sparkle.onload = checkAllLoaded;
+spoon.onload = () => { draw(); };
 
 // 描画ループ
 function draw() {
   const vw = canvas.width;
   const vh = canvas.height;
 
-  // ① カメラ映像（奥）
+  // ① カメラ映像（canvas奥）
   if (video.readyState === video.HAVE_ENOUGH_DATA) {
     ctx.drawImage(video, 0, 0, vw, vh);
   }
 
-  // ② spoon（下部いっぱいに表示）
+  // ② spoon（canvas 下端いっぱいに表示）
   if (spoon.complete) {
     const aspect = spoon.naturalWidth / spoon.naturalHeight;
     const width = vw;
     const height = width / aspect;
-    ctx.drawImage(spoon, 0, vh - height, width, height);
-  }
-
-  // ③ sparkle（中央）
-  if (sparkle.complete) {
-    const aspect = sparkle.naturalWidth / sparkle.naturalHeight;
-    const width = vw;
-    const height = width / aspect;
-    ctx.drawImage(sparkle, 0, (vh - height)/2, width, height);
+    const y = vh - height; // 下端に揃える
+    ctx.drawImage(spoon, 0, y, width, height);
   }
 
   requestAnimationFrame(draw);
