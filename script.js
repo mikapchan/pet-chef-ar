@@ -36,8 +36,8 @@ function updatePositions() {
   hat.style.position = 'absolute';
   hat.style.left = (vx + vw * 0.1) + 'px'; // video 左5%
   hat.style.top = (vy + vh * 0.2) + 'px';   // video 高さの10%下
-  hat.style.width = (vw * 1) + 'px';      // 幅40%
-  hat.style.height = 'auto';                // 縦横比維持
+  hat.style.width = (vw * 0.5) + 'px';  // 画面幅の50%
+　hat.style.height = 'auto';            // 縦横比維持
 
   // スプーン：左側中央より下
   spoon.style.position = 'absolute';
