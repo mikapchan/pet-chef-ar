@@ -8,7 +8,7 @@ const recordBtn = document.getElementById('recordBtn');
 let mediaRecorder;
 let recordedChunks = [];
 
-// canvasサイズ調整
+// canvasサイズを画面サイズに
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -24,7 +24,7 @@ navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment
     return navigator.mediaDevices.getUserMedia({ video: true }).then(stream => { video.srcObject = stream; });
   });
 
-// 画像が読み込まれてから描画開始
+// 画像が読み込まれたら描画開始
 let imagesLoaded = 0;
 function checkAllLoaded() {
   imagesLoaded++;
@@ -38,10 +38,12 @@ function draw() {
   const vw = canvas.width;
   const vh = canvas.height;
 
-  // カメラ映像
-  ctx.drawImage(video, 0, 0, vw, vh);
+  // ① カメラ映像（奥）
+  if (video.readyState === video.HAVE_ENOUGH_DATA) {
+    ctx.drawImage(video, 0, 0, vw, vh);
+  }
 
-  // spoon描画（画面下いっぱいに横幅に合わせる）
+  // ② spoon（下部いっぱいに表示）
   if (spoon.complete) {
     const aspect = spoon.naturalWidth / spoon.naturalHeight;
     const width = vw;
@@ -49,7 +51,7 @@ function draw() {
     ctx.drawImage(spoon, 0, vh - height, width, height);
   }
 
-  // sparkle描画（縦横比維持で中央）
+  // ③ sparkle（中央）
   if (sparkle.complete) {
     const aspect = sparkle.naturalWidth / sparkle.naturalHeight;
     const width = vw;
@@ -60,7 +62,7 @@ function draw() {
   requestAnimationFrame(draw);
 }
 
-// 録画ボタン
+// 録画機能
 recordBtn.addEventListener('click', () => {
   if (!mediaRecorder || mediaRecorder.state === 'inactive') {
     const stream = canvas.captureStream(30); // 30fps
