@@ -36,7 +36,7 @@ function updatePositions() {
   hat.style.position = 'absolute';
   hat.style.left = (vx + vw * 0.05) + 'px'; // video 左5%
   hat.style.top = (vy + vh * 0.1) + 'px';   // video 高さの10%下
-  hat.style.width = (vw * 0.4) + 'px';      // 幅40%
+  hat.style.width = (vw * 0.8) + 'px';      // 幅40%
   hat.style.height = 'auto';                // 縦横比維持
 
   // スプーン：左側中央より下
