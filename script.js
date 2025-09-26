@@ -37,7 +37,7 @@ function updatePositions() {
 　hat.style.top  = '50px'; // 上から10%
   hat.style.width = 'auto';
   hat.style.left = '10px';      // 左端に揃える
-　hat.style.width = '40vw';   // 画面幅いっぱい
+　hat.style.width = '60vw';   // 画面幅いっぱい
 　hat.style.height = 'auto';
   
   // スプーン：左側中央より下
