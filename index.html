@@ -3,42 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <title>ペットシェフARフレーム</title>
-<style>
-  body { margin:0; overflow:hidden; }
-  video, canvas { 
-    position:absolute; top:0; left:0; width:100%; height:100%;
-  }
-
-  #camera {
-    z-index:1; /* カメラ映像：背景の次に奥 */
-  }
-
-  #spoon {
-    position:absolute;
-    pointer-events:none;
-    z-index:2; /* 小物 */
-  }
-
-  #sparkle {
-    position:absolute;
-    top:0; left:0;
-    width:100vw;   /* 画面幅に合わせる */
-    height:auto;   /* 縦横比を維持 */
-    pointer-events:none;
-    z-index:3;
-}
-
-</style>
+  <style>
+    body { margin:0; overflow:hidden; }
+    canvas { position:absolute; top:0; left:0; width:100%; height:100%; }
+    #recordBtn {
+      position:absolute;
+      top:10px; left:10px;
+      z-index:10;
+      padding:10px 20px;
+      font-size:16px;
+    }
+  </style>
 </head>
 <body>
-  <video id="camera" autoplay playsinline muted></video>
+  <video id="camera" autoplay playsinline muted style="display:none;"></video>
   <canvas id="canvas"></canvas>
-
-  <!-- 小物 -->
-  <img id="spoon" src="spoon.png" alt="スプーン">
-
-  <!-- 雪やキラキラ -->
-  <img id="sparkle" src="sparkle.gif" alt="雪">
+  <img id="spoon" src="spoon.png" style="display:none;">
+  <img id="sparkle" src="sparkle.png" style="display:none;">
+  <button id="recordBtn">録画開始</button>
 
   <script src="script.js"></script>
 </body>
