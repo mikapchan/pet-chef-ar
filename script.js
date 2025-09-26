@@ -12,7 +12,7 @@ hat.onload = () => {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
   hat.style.position = 'absolute';
-  hat.style.width = (vw * 0.5) + 'px';   // 画面幅の50%
+  hat.style.width = (vw * 0.8) + 'px';   // 画面幅の50%
   hat.style.height = 'auto';             // 縦横比維持
   hat.style.left = (vw * 0.25) + 'px';   // 中央寄せ
   hat.style.top  = (vh * 0.1) + 'px';    // 上から10%
