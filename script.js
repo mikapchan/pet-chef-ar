@@ -6,39 +6,39 @@ const spoon = document.getElementById('spoon');
 
 let animationId; // requestAnimationFrame用
 
-// カメラ起動（背面カメラ）
+// カメラ起動（背面カメラ希望）
 navigator.mediaDevices.getUserMedia({ 
-  video: { facingMode: { exact: "environment" } } // 外カメラ
+  video: { facingMode: { ideal: "environment" } } // 背面カメラを希望
 })
 .then(stream => {
-  if ('srcObject' in video) {
-    video.srcObject = stream;
-  } else {
-    video.src = window.URL.createObjectURL(stream);
-  }
+  video.srcObject = stream;
   video.play().catch(err => console.error('Video play error:', err));
 })
 .catch(err => { 
   console.error('カメラアクセス失敗:', err);
-  // fallback: 前面カメラ
+  // フォールバック: 前面カメラ
   navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
-    .then(stream => { video.srcObject = stream; video.play(); })
+    .then(stream => { 
+      video.srcObject = stream; 
+      video.play().catch(err => console.error('Fallback play error:', err));
+    })
     .catch(err => console.error('前面カメラも失敗:', err));
 });
 
-// ペット顔トラッキングなしでもOK: 画面中央に固定配置
+// 帽子・小物を背景フレームと同じサイズで重ねる
 function updatePositions() {
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
-
-  // 帽子と小物を固定位置に
+  // 左上を原点にして幅・高さ100%で揃える
   hat.style.position = 'absolute';
-  hat.style.left = (vw / 2 - 50) + 'px'; // 調整可
-  hat.style.top = (vh / 3) + 'px';       // 調整可
+  hat.style.left = '0';
+  hat.style.top = '0';
+  hat.style.width = '100%';
+  hat.style.height = '100%';
 
   spoon.style.position = 'absolute';
-  spoon.style.left = (vw / 2 - 30) + 'px'; // 調整可
-  spoon.style.top = (vh / 2) + 'px';       // 調整可
+  spoon.style.left = '0';
+  spoon.style.top = '0';
+  spoon.style.width = '100%';
+  spoon.style.height = '100%';
 
   animationId = requestAnimationFrame(updatePositions);
 }
@@ -46,7 +46,7 @@ function updatePositions() {
 // ループ開始
 updatePositions();
 
-// カメラ停止関数
+// カメラ停止
 function stopCamera() {
   if (video.srcObject) {
     video.srcObject.getTracks().forEach(track => track.stop());
@@ -54,12 +54,12 @@ function stopCamera() {
   }
 }
 
-// requestAnimationFrame停止関数
+// requestAnimationFrame停止
 function stopUpdate() {
   if (animationId) cancelAnimationFrame(animationId);
 }
 
-// ページ離脱時にカメラとループを停止
+// ページ離脱時に停止
 window.addEventListener('beforeunload', () => {
   stopUpdate();
   stopCamera();
