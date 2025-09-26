@@ -39,12 +39,11 @@ function updatePositions() {
   hat.style.width = (vw * 0.4) + 'px';      // 幅40%
   hat.style.height = 'auto';                // 縦横比維持
 
-  // スプーン：画面下部いっぱい
-spoon.style.position = 'absolute';
-spoon.style.left = '0px';            // 左端に揃える
-spoon.style.width = '100vw';         // 幅いっぱい
-spoon.style.height = 'auto';         // 縦横比維持
-spoon.style.top = (window.innerHeight - spoon.offsetHeight) + 'px'; // 下端に配置
+  // スプーン：左側中央より下
+  spoon.style.position = 'absolute';
+  spoon.style.left = '0px';      // 左端に揃える
+　spoon.style.width = '100vw';   // 画面幅いっぱい
+　spoon.style.height = 'auto';   // 縦横比を維持
 
   animationId = requestAnimationFrame(updatePositions);
 }
