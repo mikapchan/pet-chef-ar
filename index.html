@@ -6,6 +6,7 @@
   <style>
     body { margin:0; overflow:hidden; background:#000; }
 
+    /* canvas は内部 1080x1920、画面には全画面表示 */
     canvas {
       position:absolute;
       top:0;
@@ -15,35 +16,66 @@
       z-index:1;
     }
 
-    /* 小物やカメラは canvas に描画するので非表示 */
-    #spoon, #sparkle, #camera { display:none; }
-
-    /* 録画ボタン（大きめ赤丸） */
-    #recordBtn {
-      position: fixed;
-      bottom: 50px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 10;
-      width: 200px;
-      height: 200px;
-      border-radius: 80%;
-      background-color: red;
-      border: 5px solid #fff;
-      cursor: pointer;
-      padding: 0;
-      font-size: 0;
-      box-shadow: none;
+    /* spoon：canvas上に絶対配置 */
+    #spoon {
+      position:absolute;
+      bottom:0;
+      left:0;
+      width:100vw;
+      z-index:2;
+      pointer-events:none;
     }
+
+    /* sparkle：絶対配置で動かす */
+    #sparkle {
+      position:absolute;
+      top:0;
+      left:0;
+      width:100vw;
+      height:auto;
+      z-index:3;
+      pointer-events:none;
+    }
+
+    /* 録画ボタン：赤い丸 */
+    #recordBtn {
+      position:fixed;
+      bottom:30px;
+      left:50%;
+      transform:translateX(-50%);
+      z-index:10;
+      width:60px;
+      height:60px;
+      border-radius:50%;
+      background-color:red;
+      border:none;
+      cursor:pointer;
+    }
+
+    /* 録画中の点滅アニメーション */
+    .recording {
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%,50%,100% { opacity:1; }
+      25%,75% { opacity:0.3; }
+    }
+
   </style>
 </head>
 <body>
-  <video id="camera" autoplay playsinline muted></video>
+
+  <video id="camera" autoplay playsinline muted style="display:none;"></video>
   <canvas id="canvas"></canvas>
 
-  <img id="spoon" src="spoon.png" alt="スプーン">
-  <img id="sparkle" src="sparkle.gif" alt="キラキラ">
+  <!-- 小物 -->
+  <img id="spoon" src="spoon.png">
 
+  <!-- キラキラGIF -->
+  <img id="sparkle" src="sparkle.gif">
+
+  <!-- 録画ボタン -->
   <button id="recordBtn"></button>
 
   <script src="script.js"></script>
