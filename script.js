@@ -6,8 +6,9 @@ const recordBtn = document.getElementById('recordBtn');
 
 let mediaRecorder;
 let recordedChunks = [];
-let previewContainer;
+let previewContainer; // プレビューをまとめて管理
 
+// canvas 内部サイズ固定
 canvas.width = 1080;
 canvas.height = 1920;
 
@@ -24,22 +25,16 @@ video.onloadedmetadata = () => {
   video.play();
   draw();
 };
+
 spoon.onload = () => { draw(); };
 
 function draw() {
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  // 1️⃣ カメラ映像
   if(video.readyState === video.HAVE_ENOUGH_DATA){
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
   }
 
-  // 2️⃣ sparkle動画（カメラの上、spoonの下）
-  if(sparkle.readyState >= 2){ // HAVE_CURRENT_DATA以上
-    ctx.drawImage(sparkle, 0, 0, canvas.width, canvas.height);
-  }
-
-  // 3️⃣ spoon（最前面）
   if(spoon.complete){
     const aspect = spoon.naturalWidth / spoon.naturalHeight;
     const width = canvas.width;
@@ -50,7 +45,8 @@ function draw() {
 
   requestAnimationFrame(draw);
 }
-// 録画ボタン
+
+// 🔴 録画ボタン
 recordBtn.addEventListener('click', ()=>{
   if(!mediaRecorder || mediaRecorder.state==='inactive'){
     const stream = canvas.captureStream(30);
@@ -63,19 +59,22 @@ recordBtn.addEventListener('click', ()=>{
     mediaRecorder.onstop = showPreview;
 
     mediaRecorder.start();
-    recordBtn.classList.add('recording');
+    recordBtn.classList.add('recording'); // 点滅開始
   }else if(mediaRecorder.state==='recording'){
     mediaRecorder.stop();
-    recordBtn.classList.remove('recording');
+    recordBtn.classList.remove('recording'); // 点滅停止
   }
 });
 
-// プレビュー＆保存UI
+// ✅ プレビュー＆手動保存UI
 function showPreview(){
   const blob = new Blob(recordedChunks, {type:'video/webm'});
   const url = URL.createObjectURL(blob);
 
+  // 既存プレビューがあれば消去
   if(previewContainer) previewContainer.remove();
+
+  // コンテナ
   previewContainer = document.createElement('div');
   Object.assign(previewContainer.style, {
     position: 'fixed',
@@ -89,6 +88,7 @@ function showPreview(){
     zIndex: '9999'
   });
 
+  // プレビュー動画
   const previewVideo = document.createElement('video');
   previewVideo.src = url;
   previewVideo.controls = true;
@@ -96,8 +96,9 @@ function showPreview(){
   previewVideo.style.maxWidth = '90vw';
   previewVideo.style.maxHeight = '70vh';
 
+  // 保存ボタン
   const saveBtn = document.createElement('button');
-  saveBtn.textContent = 'MP4に変換して保存';
+  saveBtn.textContent = '保存する';
   Object.assign(saveBtn.style, {
     marginTop: '20px',
     padding: '20px 40px',
@@ -107,8 +108,15 @@ function showPreview(){
     border: 'none',
     cursor: 'pointer'
   });
-  saveBtn.addEventListener('click', ()=> convertToMp4(blob));
+  saveBtn.addEventListener('click', ()=>{
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'pet_chefs_ar.webm';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
 
+  // 閉じる(背景クリックで消える)
   previewContainer.addEventListener('click', e=>{
     if(e.target===previewContainer){
       previewContainer.remove();
@@ -119,27 +127,6 @@ function showPreview(){
   previewContainer.appendChild(previewVideo);
   previewContainer.appendChild(saveBtn);
   document.body.appendChild(previewContainer);
-}
-
-// ffmpeg.wasmでwebm→mp4変換
-async function convertToMp4(webmBlob){
-  const { createFFmpeg, fetchFile } = FFmpeg;
-  const ffmpeg = createFFmpeg({ log: true });
-  await ffmpeg.load();
-
-  const data = await fetchFile(webmBlob);
-  ffmpeg.FS('writeFile','input.webm',data);
-  await ffmpeg.run('-i','input.webm','-c:v','libx264','-c:a','aac','output.mp4');
-
-  const mp4Data = ffmpeg.FS('readFile','output.mp4');
-  const mp4Blob = new Blob([mp4Data.buffer], { type:'video/mp4' });
-  const mp4Url = URL.createObjectURL(mp4Blob);
-
-  const a = document.createElement('a');
-  a.href = mp4Url;
-  a.download = 'pet_chefs_ar.mp4';
-  a.click();
-  URL.revokeObjectURL(mp4Url);
 }
 
 // ページ離脱でカメラ停止
