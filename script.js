@@ -7,6 +7,8 @@ const recordBtn = document.getElementById('recordBtn');
 
 let mediaRecorder;
 let recordedChunks = [];
+let recording = false;
+let blinkInterval;
 
 // canvas 内部サイズ固定 1080x1920
 canvas.width = 1080;
@@ -58,6 +60,7 @@ function draw() {
 // 録画ボタン
 recordBtn.addEventListener('click', ()=>{
   if(!mediaRecorder || mediaRecorder.state==='inactive'){
+    // 録画開始
     const stream = canvas.captureStream(30);
     let options = { mimeType:'video/webm; codecs=vp9' };
     if(!MediaRecorder.isTypeSupported(options.mimeType)) options={ mimeType:'' };
@@ -76,10 +79,19 @@ recordBtn.addEventListener('click', ()=>{
     };
 
     mediaRecorder.start();
-    recordBtn.style.boxShadow = '0 0 10px 2px yellow'; // 録画中の視覚的フィードバック
+    recording = true;
+
+    // 録画中点滅
+    blinkInterval = setInterval(()=>{
+      recordBtn.style.opacity = recordBtn.style.opacity === '0.4' ? '1' : '0.4';
+    }, 500);
+
   } else if(mediaRecorder.state==='recording'){
+    // 録画停止
     mediaRecorder.stop();
-    recordBtn.style.boxShadow = 'none';
+    recording = false;
+    clearInterval(blinkInterval);
+    recordBtn.style.opacity = '1';
   }
 });
 
