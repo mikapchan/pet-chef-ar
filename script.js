@@ -2,12 +2,13 @@ const video = document.getElementById('camera');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const spoon = document.getElementById('spoon');
+const sparkle = document.getElementById('sparkle');
 const recordBtn = document.getElementById('recordBtn');
 
 let mediaRecorder;
 let recordedChunks = [];
 
-// canvas 内部サイズ固定 1080 x 1920
+// canvas 内部サイズ固定 1080x1920
 canvas.width = 1080;
 canvas.height = 1920;
 
@@ -25,13 +26,12 @@ video.onloadedmetadata = () => {
   draw();
 };
 
-spoon.onload = () => {
-  draw();
-};
+// spoon と sparkle の読み込み完了で描画開始
+spoon.onload = () => draw();
+sparkle.onload = () => draw();
 
 function draw() {
-  // 1080x1920 canvas に描画
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // カメラ映像
   if(video.readyState === video.HAVE_ENOUGH_DATA){
@@ -45,6 +45,11 @@ function draw() {
     const height = width / aspect;
     const y = canvas.height - height;
     ctx.drawImage(spoon, 0, y, width, height);
+  }
+
+  // sparkle GIF：canvas 全体に描画
+  if(sparkle.complete){
+    ctx.drawImage(sparkle, 0, 0, canvas.width, canvas.height);
   }
 
   requestAnimationFrame(draw);
@@ -71,10 +76,10 @@ recordBtn.addEventListener('click', ()=>{
     };
 
     mediaRecorder.start();
-    recordBtn.textContent='録画停止';
-  }else if(mediaRecorder.state==='recording'){
+    recordBtn.style.boxShadow = '0 0 10px 2px yellow'; // 録画中の視覚的フィードバック
+  } else if(mediaRecorder.state==='recording'){
     mediaRecorder.stop();
-    recordBtn.textContent='録画開始';
+    recordBtn.style.boxShadow = 'none';
   }
 });
 
@@ -82,4 +87,3 @@ recordBtn.addEventListener('click', ()=>{
 window.addEventListener('beforeunload', ()=>{
   if(video.srcObject) video.srcObject.getTracks().forEach(track=>track.stop());
 });
-
