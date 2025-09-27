@@ -29,10 +29,17 @@ spoon.onload = () => { draw(); };
 function draw() {
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
+  // 1️⃣ カメラ映像
   if(video.readyState === video.HAVE_ENOUGH_DATA){
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
   }
 
+  // 2️⃣ sparkle動画（カメラの上、spoonの下）
+  if(sparkle.readyState >= 2){ // HAVE_CURRENT_DATA以上
+    ctx.drawImage(sparkle, 0, 0, canvas.width, canvas.height);
+  }
+
+  // 3️⃣ spoon（最前面）
   if(spoon.complete){
     const aspect = spoon.naturalWidth / spoon.naturalHeight;
     const width = canvas.width;
@@ -43,7 +50,6 @@ function draw() {
 
   requestAnimationFrame(draw);
 }
-
 // 録画ボタン
 recordBtn.addEventListener('click', ()=>{
   if(!mediaRecorder || mediaRecorder.state==='inactive'){
